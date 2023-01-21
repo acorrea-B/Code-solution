@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from order import count_words
+from count_words import count_words
 
 
 def test_fail_not_exist_file_to_count_words():
