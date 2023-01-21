@@ -3,10 +3,10 @@ install:
 		pip install -r requirements.txt
 
 format:
-	black *.py
+	black */*.py
 
 lint:
-	pylint --disable=R,C *.py
+	pylint --disable=R,C */*.py
 
 test:
 	python -m pytest -vv */test.py
