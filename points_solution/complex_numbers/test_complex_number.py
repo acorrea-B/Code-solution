@@ -5,7 +5,6 @@ def test_sum_complex_number():
     A = Complejo(2, 1)
     B = Complejo(5, 6)
 
-    print(A)
     assert A.sum(B) == 7 + 7j
 
 
