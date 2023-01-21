@@ -9,4 +9,4 @@ lint:
 	pylint --disable=R,C */*.py
 
 test:
-	python -m pytest -vv */test.py
+	python -m pytest -vv */test_*.py
