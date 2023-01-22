@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_db:/var/lib/postgresql/data/
+
+  web:
+    build: .
+    command: bash -c "python manage.py makemigrations
+                      && python manage.py migrate && 
+                      python manage.py runserver 0.0.0.0:8000"
+    container_name: store
+    volumes:
+      - .:/store
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASS=postgres
+    restart: on-failure
+    depends_on:
+      - db
+
+volumes:
+  postgres_db:
