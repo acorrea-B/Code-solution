@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from points_solution.count_words.words import counter_words
+from words import counter_words
 
 
 def test_fail_not_exist_file_to_count_words():

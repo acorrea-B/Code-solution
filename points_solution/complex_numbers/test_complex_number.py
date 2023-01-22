@@ -1,4 +1,4 @@
-from points_solution.complex_numbers.complejo import Complejo
+from complejo import Complejo
 
 
 def test_sum_complex_number():
