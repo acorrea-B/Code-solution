@@ -1,7 +1,7 @@
 import os
 
 
-def count_words(file_name):
+def counter_words(file_name):
     try:
         file = open(os.path.dirname(__file__) + f"/{file_name}", "r")
     except:
