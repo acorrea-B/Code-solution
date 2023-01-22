@@ -21,7 +21,9 @@ def test_fail_words_not_match_to_count_words():
 
 def test_succes_count_words():
     counter_words("words.txt")
-    created_file = open(os.path.dirname(__file__) + "/words_counted.txt", "r", encoding="utf-8")
+    created_file = open(
+        os.path.dirname(__file__) + "/words_counted.txt", "r", encoding="utf-8"
+    )
     words = created_file.readlines()
 
     assert int(words[0]) == 3

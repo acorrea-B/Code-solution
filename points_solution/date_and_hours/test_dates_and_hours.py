@@ -9,7 +9,9 @@ from dates_and_hours import subtract_date
 def test_fail_init_date_greater_than_finish_date_format_date():
     with pytest.raises(ValueError) as excep_getting:
         format_date("21/01/2024 18:12:39 +00:00", "21/01/2023 18:12:39 +00:00")
-    assert str(excep_getting.value) == "Try to make the start date less than the end date"
+    assert (
+        str(excep_getting.value) == "Try to make the start date less than the end date"
+    )
 
 
 def test_fail_empty_init_date_format_day():

@@ -17,7 +17,9 @@ def counter_words(file_name):
         for unique_word in sorted(unique_words):
             counter += str(words.count(unique_word)) + " "
         # Create output file
-        new_file = open(os.path.dirname(__file__) + "/words_counted.txt", "w", encoding="utf-8")
+        new_file = open(
+            os.path.dirname(__file__) + "/words_counted.txt", "w", encoding="utf-8"
+        )
         # Add result on output file
         new_file.write(f"{len(unique_words)} \n")
         new_file.write(counter)
