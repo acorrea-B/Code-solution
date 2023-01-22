@@ -18,10 +18,8 @@ Como se muestra en la siguiente estructura:
       .
     ├── complex_numbers
     │   ├── complejo.py
-    │   ├── __init__.py
     │   └── test_complex_number.py
     ├── count_words
-    │   ├── __init__.py
     │   ├── test_count_words.py
     │   ├── words.py
     │   ├── words.txt
