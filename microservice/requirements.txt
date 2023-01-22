@@ -1,0 +1,6 @@
+pylint
+black
+django==3.1.5
+djangorestframework==3.14.0
+django-concurrency==2.4
+drf_yasg==1.21.4
