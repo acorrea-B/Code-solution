@@ -1,9 +1,9 @@
 
 # Points solutions
 
-En esta carpeta encontrarás la solución de los puntos 1 al 4.
+In this folder you will find the solution of points 1 to 4.
 
-Como se muestra en la siguiente estructura:
+As shown in the following structure:
 
 ## Features
 
