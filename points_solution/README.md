@@ -88,3 +88,11 @@ To run tests, run the following command
   make test
 ```
 
+
+## Running pylint
+
+To run pylint, run the following command
+
+```bash
+  make lint
+```
