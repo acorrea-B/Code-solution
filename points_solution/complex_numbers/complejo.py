@@ -4,8 +4,8 @@ class Complejo(complex):
         self.y = float(y)
         super(Complejo).__init__()
 
-    def __round__(self, complex):
-        return Complejo(round(complex.real, 2), round(complex.imag, 2))
+    def __round__(self, value):
+        return Complejo(round(value.real, 2), round(value.imag, 2))
 
     def sum(self, b):
         return self.__round__(self + b)

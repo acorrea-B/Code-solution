@@ -3,12 +3,12 @@ from datetime import timedelta
 
 
 def format_date(date_init, date_finish):
-    format = "%d/%m/%Y %H:%M:%S %z"
+    date_format = "%d/%m/%Y %H:%M:%S %z"
     if not date_init or not date_finish:
         raise ValueError("date_init and date_finish can't be empty")
 
-    date_init = datetime.strptime(date_init, format)
-    date_finish = datetime.strptime(date_finish, format)
+    date_init = datetime.strptime(date_init, date_format)
+    date_finish = datetime.strptime(date_finish, date_format)
 
     if not date_init < date_finish:
         raise ValueError("Try to make the start date less than the end date")
@@ -50,7 +50,6 @@ def working_hours(date_init, date_finish):
 
 
 def subtract_date(date_init, date_finish):
-    format = "%S-%H-%d"
     date_init, date_finish = format_date(date_init, date_finish)
 
     result = date_finish - date_init

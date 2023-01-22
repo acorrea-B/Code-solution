@@ -2,6 +2,11 @@ install:
 	pip install --upgrade pip &&\
 		pip install -r requirements.txt
 
+venv: 
+	python3 -m venv ./venv &&\
+		source venv/bin/activate && \
+		make install
+
 format:
 	black */*.py
 
