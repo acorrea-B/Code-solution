@@ -35,7 +35,6 @@ Como se muestra en la siguiente estructura:
     │   └── test_product.py
     ├── __init__.py
     ├── Makefile
-    ├── pyvenv.cfg
     ├── README.md
     └── requirements.txt
 ```
