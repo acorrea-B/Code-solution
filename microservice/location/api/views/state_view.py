@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import StateSerializer
-from location.serializers import UpdateStateSerializer
+from location.api.serializers import StateSerializer
+from location.api.serializers import UpdateStateSerializer
 
 from location.models import State
 

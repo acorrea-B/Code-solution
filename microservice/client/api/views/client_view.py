@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from microservice.client.api.views.serializers import ClientSerializer
-from microservice.client.api.views.serializers import UpdateClientSerializer
+from client.api.serializers import ClientSerializer
+from client.api.serializers import UpdateClientSerializer
 
 from client.models import Client
 
@@ -124,16 +124,20 @@ class ClientView(generics.ListAPIView):
         if request.query_params.get("store_id"):
             return Response(
                 ClientSerializer(
-                    Client.objects.filter(store_id=request.query_params.get("store_id")),
+                    Client.objects.filter(
+                        favorite_store_id=request.query_params.get("store_id")
+                    ),
                     many=True,
                     context=serializer_context,
                 ).data
             )
-        
+
         if request.query_params.get("state_id"):
             return Response(
                 ClientSerializer(
-                    Client.objects.filter(state_id=request.query_params.get("state_id")),
+                    Client.objects.filter(
+                        state_id=request.query_params.get("state_id")
+                    ),
                     many=True,
                     context=serializer_context,
                 ).data

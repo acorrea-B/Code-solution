@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from microservice.location.api.serializers import CountrySerializer
-from microservice.location.api.serializers import UpdateCountry
+from location.api.serializers import CountrySerializer
+from location.api.serializers import UpdateCountry
 
 from location.models import Country
 
