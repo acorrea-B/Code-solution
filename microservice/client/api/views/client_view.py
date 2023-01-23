@@ -5,27 +5,27 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from microservice.location.api.serializers import CitySerializer
-from microservice.location.api.serializers import UpdateCitySerializer
+from microservice.client.api.views.serializers import ClientSerializer
+from microservice.client.api.views.serializers import UpdateClientSerializer
 
-from location.models import City
+from client.models import Client
 
 
-class CityView(generics.ListAPIView):
+class ClientView(generics.ListAPIView):
     def get_object(self, id):
         """
         Helper method to get the object with given id
         """
         try:
-            return City.objects.get(id=id)
-        except City.DoesNotExist:
+            return Client.objects.get(id=id)
+        except Client.DoesNotExist:
             return None
 
     @swagger_auto_schema(
-        request_body=CitySerializer,
+        request_body=ClientSerializer,
         responses={
-            status.HTTP_201_CREATED: CitySerializer(),
-            status.HTTP_400_BAD_REQUEST: CitySerializer,
+            status.HTTP_201_CREATED: ClientSerializer(),
+            status.HTTP_400_BAD_REQUEST: ClientSerializer,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -33,7 +33,7 @@ class CityView(generics.ListAPIView):
             "request": request,
         }
 
-        serializer = CitySerializer(data=request.data, context=serializer_context)
+        serializer = ClientSerializer(data=request.data, context=serializer_context)
 
         serializer.is_valid(raise_exception=True)
 
@@ -45,10 +45,10 @@ class CityView(generics.ListAPIView):
         )
 
     @swagger_auto_schema(
-        request_body=UpdateCitySerializer,
+        request_body=UpdateClientSerializer,
         responses={
-            status.HTTP_202_ACCEPTED: UpdateCitySerializer(),
-            status.HTTP_400_BAD_REQUEST: UpdateCitySerializer,
+            status.HTTP_202_ACCEPTED: UpdateClientSerializer(),
+            status.HTTP_400_BAD_REQUEST: UpdateClientSerializer,
         },
     )
     def put(self, request, *args, **kwargs):
@@ -56,15 +56,15 @@ class CityView(generics.ListAPIView):
         serializer_context = {
             "request": request,
         }
-        city = self.get_object(request.data.get("id"))
+        client = self.get_object(request.data.get("id"))
 
-        if not city:
+        if not client:
             return Response(
-                {"message": "City does not exists"},
+                {"message": "Client does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateCitySerializer(city, data=request.data, partial=True)
+        serializer = UpdateClientSerializer(client, data=request.data, partial=True)
 
         serializer.is_valid(raise_exception=True)
 
@@ -80,7 +80,13 @@ class CityView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="City id",
+                description="Client id",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
+                "store_id",
+                openapi.IN_QUERY,
+                description="Store id",
                 type=openapi.TYPE_INTEGER,
             ),
             openapi.Parameter(
@@ -91,8 +97,8 @@ class CityView(generics.ListAPIView):
             ),
         ],
         responses={
-            status.HTTP_200_OK: CitySerializer(many=True),
-            status.HTTP_400_BAD_REQUEST: CitySerializer,
+            status.HTTP_200_OK: ClientSerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: ClientSerializer,
         },
     )
     def get(self, request):
@@ -101,32 +107,41 @@ class CityView(generics.ListAPIView):
         }
 
         if request.query_params.get("id"):
-            city = self.get_object(request.query_params.get("id"))
+            client = self.get_object(request.query_params.get("id"))
 
-            if not city:
+            if not client:
                 return Response(
-                    {"message": "City does not exists"},
+                    {"message": "Client does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(
-                CitySerializer(
-                    city,
+                ClientSerializer(
+                    client,
                     context=serializer_context,
                 ).data
             )
 
+        if request.query_params.get("store_id"):
+            return Response(
+                ClientSerializer(
+                    Client.objects.filter(store_id=request.query_params.get("store_id")),
+                    many=True,
+                    context=serializer_context,
+                ).data
+            )
+        
         if request.query_params.get("state_id"):
             return Response(
-                CitySerializer(
-                    City.objects.filter(state_id=request.query_params.get("state_id")),
+                ClientSerializer(
+                    Client.objects.filter(state_id=request.query_params.get("state_id")),
                     many=True,
                     context=serializer_context,
                 ).data
             )
 
         return Response(
-            CitySerializer(
-                City.objects.all().order_by("id"),
+            ClientSerializer(
+                Client.objects.all().order_by("id"),
                 many=True,
                 context=serializer_context,
             ).data
@@ -137,7 +152,7 @@ class CityView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="City id",
+                description="Client id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
@@ -148,12 +163,12 @@ class CityView(generics.ListAPIView):
     )
     def delete(self, request):
         if request.query_params.get("id"):
-            city = self.get_object(request.query_params.get("id"))
+            client = self.get_object(request.query_params.get("id"))
 
-            if not city:
+            if not client:
                 return Response(
-                    {"message": "City does not exists"},
+                    {"message": "Client does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            city.delete()
-            return Response({"message": "City deleted"}, status.HTTP_200_OK)
+            client.delete()
+            return Response({"message": "Client deleted"}, status.HTTP_200_OK)

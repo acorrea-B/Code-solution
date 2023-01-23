@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import CountrySerializer
-from location.serializers import UpdateCountry
+from microservice.location.api.serializers import CountrySerializer
+from microservice.location.api.serializers import UpdateCountry
 
 from location.models import Country
 
@@ -79,7 +79,7 @@ class CountryView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="test manual param",
+                description="Country id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
