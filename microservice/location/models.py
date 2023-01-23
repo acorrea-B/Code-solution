@@ -17,4 +17,4 @@ class State(models.Model):
 class City(models.Model):
     name = models.CharField(max_length=400)
     code = models.CharField(max_length=8)
-    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name="state")

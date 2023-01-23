@@ -5,8 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from store.serializers import StoreSerializer
-from store.serializers import UpdateStoreSerializer
+from store.api.serializers import StoreSerializer
+from store.api.serializers import UpdateStoreSerializer
 
 from store.models import Store
 

@@ -12,12 +12,10 @@ services:
 
   web:
     build: .
-    command: bash -c "python manage.py makemigrations
-                      && python manage.py migrate && 
-                      python manage.py runserver 0.0.0.0:8000"
-    container_name: store_juanita
+    command: make run
+    container_name: amazonas_store
     volumes:
-      - .:/store_juanita
+      - .:/amazonas_store
     ports:
       - "8000:8000"
     environment:
