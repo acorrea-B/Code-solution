@@ -38,7 +38,6 @@ class CountryView(generics.ListAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-
         return Response(
             CountrySerializer(serializer.data, context=serializer_context).data,
             status.HTTP_201_CREATED,
@@ -64,9 +63,7 @@ class CountryView(generics.ListAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateCountry(
-            country, data=request.data, partial=True
-        )
+        serializer = UpdateCountry(country, data=request.data, partial=True)
 
         serializer.is_valid(raise_exception=True)
 
@@ -128,7 +125,10 @@ class CountryView(generics.ListAPIView):
                 type=openapi.TYPE_INTEGER,
             )
         ],
-        responses={status.HTTP_200_OK: "message", status.HTTP_400_BAD_REQUEST: "message"},
+        responses={
+            status.HTTP_200_OK: "message",
+            status.HTTP_400_BAD_REQUEST: "message",
+        },
     )
     def delete(self, request):
         if request.query_params.get("id"):

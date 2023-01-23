@@ -189,7 +189,7 @@ class ListCountry(TestCase):
 
     def test_success_list(self):
         response = self.api.get(
-            f"/api/v1/location/country/",
+            "/api/v1/location/country/",
             format="json",
         )
 
@@ -571,7 +571,7 @@ class ListCity(TestCase):
 
     def test_success_list_all_citys(self):
         response = self.api.get(
-            f"/api/v1/location/country/state/city/",
+            "/api/v1/location/country/state/city/",
             format="json",
         )
 

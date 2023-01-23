@@ -5,27 +5,27 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import CitySerializer
-from location.serializers import UpdateCitySerializer
+from store.serializers import StoreSerializer
+from store.serializers import UpdateStoreSerializer
 
-from location.models import City
+from store.models import Store
 
 
-class CityView(generics.ListAPIView):
+class StoreView(generics.ListAPIView):
     def get_object(self, id):
         """
         Helper method to get the object with given id
         """
         try:
-            return City.objects.get(id=id)
-        except City.DoesNotExist:
+            return Store.objects.get(id=id)
+        except Store.DoesNotExist:
             return None
 
     @swagger_auto_schema(
-        request_body=CitySerializer,
+        request_body=StoreSerializer,
         responses={
-            status.HTTP_201_CREATED: CitySerializer(),
-            status.HTTP_400_BAD_REQUEST: CitySerializer,
+            status.HTTP_201_CREATED: StoreSerializer(),
+            status.HTTP_400_BAD_REQUEST: StoreSerializer,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -33,22 +33,21 @@ class CityView(generics.ListAPIView):
             "request": request,
         }
 
-        serializer = CitySerializer(data=request.data, context=serializer_context)
+        serializer = StoreSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
-
         serializer.save()
 
         return Response(
-            serializer.data,
+            StoreSerializer(serializer.data, context=serializer_context).data,
             status.HTTP_201_CREATED,
         )
 
     @swagger_auto_schema(
-        request_body=UpdateCitySerializer,
+        request_body=UpdateStoreSerializer,
         responses={
-            status.HTTP_202_ACCEPTED: UpdateCitySerializer(),
-            status.HTTP_400_BAD_REQUEST: UpdateCitySerializer,
+            status.HTTP_202_ACCEPTED: StoreSerializer(),
+            status.HTTP_400_BAD_REQUEST: UpdateStoreSerializer,
         },
     )
     def put(self, request, *args, **kwargs):
@@ -56,22 +55,22 @@ class CityView(generics.ListAPIView):
         serializer_context = {
             "request": request,
         }
-        city = self.get_object(request.data.get("id"))
+        country = self.get_object(request.data.get("id"))
 
-        if not city:
+        if not country:
             return Response(
-                {"message": "City does not exists"},
+                {"message": "Store does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateCitySerializer(city, data=request.data, partial=True)
+        serializer = UpdateStoreSerializer(country, data=request.data, partial=True)
 
         serializer.is_valid(raise_exception=True)
 
         serializer.save()
 
         return Response(
-            serializer.data,
+            StoreSerializer(serializer.data, context=serializer_context).data,
             status.HTTP_202_ACCEPTED,
         )
 
@@ -80,19 +79,13 @@ class CityView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="City id",
+                description="Id of store",
                 type=openapi.TYPE_INTEGER,
-            ),
-            openapi.Parameter(
-                "state_id",
-                openapi.IN_QUERY,
-                description="State id",
-                type=openapi.TYPE_INTEGER,
-            ),
+            )
         ],
         responses={
-            status.HTTP_200_OK: CitySerializer(many=True),
-            status.HTTP_400_BAD_REQUEST: CitySerializer,
+            status.HTTP_200_OK: StoreSerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: StoreSerializer,
         },
     )
     def get(self, request):
@@ -101,32 +94,23 @@ class CityView(generics.ListAPIView):
         }
 
         if request.query_params.get("id"):
-            city = self.get_object(request.query_params.get("id"))
+            store = self.get_object(request.query_params.get("id"))
 
-            if not city:
+            if not store:
                 return Response(
-                    {"message": "City does not exists"},
+                    {"message": "Store does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(
-                CitySerializer(
-                    city,
-                    context=serializer_context,
-                ).data
-            )
-
-        if request.query_params.get("state_id"):
-            return Response(
-                CitySerializer(
-                    City.objects.filter(state_id=request.query_params.get("state_id")),
-                    many=True,
+                StoreSerializer(
+                    store,
                     context=serializer_context,
                 ).data
             )
 
         return Response(
-            CitySerializer(
-                City.objects.all().order_by("id"),
+            StoreSerializer(
+                Store.objects.all().order_by("id"),
                 many=True,
                 context=serializer_context,
             ).data
@@ -137,7 +121,7 @@ class CityView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="City id",
+                description="Store id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
@@ -148,12 +132,12 @@ class CityView(generics.ListAPIView):
     )
     def delete(self, request):
         if request.query_params.get("id"):
-            City = self.get_object(request.query_params.get("id"))
+            store = self.get_object(request.query_params.get("id"))
 
-            if not City:
+            if not store:
                 return Response(
-                    {"message": "City does not exists"},
+                    {"message": "Store does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            City.delete()
-            return Response({"message": "City deleted"}, status.HTTP_200_OK)
+            store.delete()
+            return Response({"message": "Store deleted"}, status.HTTP_200_OK)
