@@ -12,9 +12,7 @@ services:
 
   web:
     build: .
-    command: bash -c "python manage.py makemigrations
-                      && python manage.py migrate && 
-                      python manage.py runserver 0.0.0.0:8000"
+    command: make run
     container_name: amazonas_store
     volumes:
       - .:/amazonas_store
