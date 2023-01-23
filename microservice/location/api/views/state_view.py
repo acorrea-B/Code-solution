@@ -5,11 +5,8 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import StateSerializerRequest
-from location.serializers import UpdateStateSerializerRequest
-
-from location.serializers import StateSerializerResponse
-
+from location.serializers import StateSerializer
+from location.serializers import UpdateStateSerializer
 
 from location.models import State
 
@@ -25,10 +22,10 @@ class StateView(generics.ListAPIView):
             return None
 
     @swagger_auto_schema(
-        request_body=StateSerializerRequest,
+        request_body=StateSerializer,
         responses={
-            status.HTTP_201_CREATED: StateSerializerResponse(),
-            status.HTTP_400_BAD_REQUEST: StateSerializerRequest,
+            status.HTTP_201_CREATED: StateSerializer(),
+            status.HTTP_400_BAD_REQUEST: StateSerializer,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -36,7 +33,7 @@ class StateView(generics.ListAPIView):
             "request": request,
         }
 
-        serializer = StateSerializerRequest(data=request.data, context = serializer_context)
+        serializer = StateSerializer(data=request.data, context = serializer_context)
         
         serializer.is_valid(raise_exception=True)
         
@@ -48,10 +45,10 @@ class StateView(generics.ListAPIView):
         )
 
     @swagger_auto_schema(
-        request_body=UpdateStateSerializerRequest,
+        request_body=UpdateStateSerializer,
         responses={
-            status.HTTP_202_ACCEPTED: UpdateStateSerializerRequest(),
-            status.HTTP_400_BAD_REQUEST: UpdateStateSerializerRequest,
+            status.HTTP_202_ACCEPTED: UpdateStateSerializer(),
+            status.HTTP_400_BAD_REQUEST: UpdateStateSerializer,
         },
     )
     def put(self, request, *args, **kwargs):
@@ -67,7 +64,7 @@ class StateView(generics.ListAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateStateSerializerRequest(
+        serializer = UpdateStateSerializer(
             State, data=request.data, partial=True
         )
 
@@ -89,8 +86,8 @@ class StateView(generics.ListAPIView):
             )
         ],
         responses={
-            status.HTTP_200_OK: StateSerializerResponse(many=True),
-            status.HTTP_400_BAD_REQUEST: StateSerializerResponse,
+            status.HTTP_200_OK: StateSerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: StateSerializer,
         },
     )
     def get(self, request):
@@ -107,14 +104,14 @@ class StateView(generics.ListAPIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(
-                StateSerializerResponse(
+                StateSerializer(
                     state,
                     context=serializer_context,
                 ).data
             )
 
         return Response(
-            StateSerializerResponse(
+            StateSerializer(
                 State.objects.all().order_by("id"),
                 many=True,
                 context=serializer_context,

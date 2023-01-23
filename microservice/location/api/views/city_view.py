@@ -5,27 +5,27 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import CountrySerializer
-from location.serializers import UpdateCountry
+from location.serializers import CitySerializer
+from location.serializers import UpdateCitySerializer
 
-from location.models import Country
+from location.models import City
 
 
-class CountryView(generics.ListAPIView):
+class CityView(generics.ListAPIView):
     def get_object(self, id):
         """
         Helper method to get the object with given id
         """
         try:
-            return Country.objects.get(id=id)
-        except Country.DoesNotExist:
+            return City.objects.get(id=id)
+        except City.DoesNotExist:
             return None
 
     @swagger_auto_schema(
-        request_body=CountrySerializer,
+        request_body=CitySerializer,
         responses={
-            status.HTTP_201_CREATED: CountrySerializer(),
-            status.HTTP_400_BAD_REQUEST: CountrySerializer,
+            status.HTTP_201_CREATED: CitySerializer(),
+            status.HTTP_400_BAD_REQUEST: CitySerializer,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -33,22 +33,22 @@ class CountryView(generics.ListAPIView):
             "request": request,
         }
 
-        serializer = CountrySerializer(data=request.data)
-
+        serializer = CitySerializer(data=request.data, context = serializer_context)
+        
         serializer.is_valid(raise_exception=True)
+        
         serializer.save()
 
-
         return Response(
-            CountrySerializer(serializer.data, context=serializer_context).data,
+           serializer.data,
             status.HTTP_201_CREATED,
         )
 
     @swagger_auto_schema(
-        request_body=UpdateCountry,
+        request_body=UpdateCitySerializer,
         responses={
-            status.HTTP_202_ACCEPTED: CountrySerializer(),
-            status.HTTP_400_BAD_REQUEST: UpdateCountry,
+            status.HTTP_202_ACCEPTED: UpdateCitySerializer(),
+            status.HTTP_400_BAD_REQUEST: UpdateCitySerializer,
         },
     )
     def put(self, request, *args, **kwargs):
@@ -56,24 +56,23 @@ class CountryView(generics.ListAPIView):
         serializer_context = {
             "request": request,
         }
-        country = self.get_object(request.data.get("id"))
+        city = self.get_object(request.data.get("id"))
 
-        if not country:
+        if not city:
             return Response(
-                {"message": "Country does not exists"},
+                {"message": "City does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateCountry(
-            country, data=request.data, partial=True
+        serializer = UpdateCitySerializer(
+            city, data=request.data, partial=True
         )
 
         serializer.is_valid(raise_exception=True)
 
         serializer.save()
 
-        return Response(
-            CountrySerializer(serializer.data, context=serializer_context).data,
+        return Response(serializer.data,
             status.HTTP_202_ACCEPTED,
         )
 
@@ -82,13 +81,19 @@ class CountryView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="test manual param",
+                description="City id",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
+                "state_id",
+                openapi.IN_QUERY,
+                description="State id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
         responses={
-            status.HTTP_200_OK: CountrySerializer(many=True),
-            status.HTTP_400_BAD_REQUEST: CountrySerializer,
+            status.HTTP_200_OK: CitySerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: CitySerializer,
         },
     )
     def get(self, request):
@@ -97,23 +102,32 @@ class CountryView(generics.ListAPIView):
         }
 
         if request.query_params.get("id"):
-            country = self.get_object(request.query_params.get("id"))
+            city = self.get_object(request.query_params.get("id"))
 
-            if not country:
+            if not city:
                 return Response(
-                    {"message": "Country does not exists"},
+                    {"message": "City does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(
-                CountrySerializer(
-                    country,
+                CitySerializer(
+                    city,
+                    context=serializer_context,
+                ).data
+            )
+        
+        if request.query_params.get("state_id"):
+            return Response(
+                CitySerializer(
+                    City.objects.filter(state_id=request.query_params.get("state_id")),
+                    many=True,
                     context=serializer_context,
                 ).data
             )
 
         return Response(
-            CountrySerializer(
-                Country.objects.all().order_by("id"),
+            CitySerializer(
+                City.objects.all().order_by("id"),
                 many=True,
                 context=serializer_context,
             ).data
@@ -124,7 +138,7 @@ class CountryView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="Country id",
+                description="City id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
@@ -132,12 +146,12 @@ class CountryView(generics.ListAPIView):
     )
     def delete(self, request):
         if request.query_params.get("id"):
-            country = self.get_object(request.query_params.get("id"))
+            City = self.get_object(request.query_params.get("id"))
 
-            if not country:
+            if not City:
                 return Response(
-                    {"message": "Country does not exists"},
+                    {"message": "City does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            country.delete()
-            return Response({"message": "Country deleted"}, status.HTTP_200_OK)
+            City.delete()
+            return Response({"message": "City deleted"}, status.HTTP_200_OK)

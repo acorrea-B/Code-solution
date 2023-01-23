@@ -5,14 +5,14 @@ from location.models import State
 from location.models import City
 
 
-class CountrySerializerRequest(serializers.ModelSerializer):
+class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
         fields = "__all__"
         read_only_fields = ("id",)
 
 
-class UpdateCountrySerializerRequest(serializers.ModelSerializer):
+class UpdateCountry(serializers.ModelSerializer):
     id = serializers.IntegerField()
 
     class Meta:
@@ -20,13 +20,7 @@ class UpdateCountrySerializerRequest(serializers.ModelSerializer):
         fields = ("id", "name", "code")
 
 
-class CountrySerializerResponse(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = "__all__"
-
-
-class StateSerializerRequest(serializers.ModelSerializer):
+class StateSerializer(serializers.ModelSerializer):
 
     country = serializers.PrimaryKeyRelatedField(
         read_only=False, queryset=Country.objects.all()
@@ -39,7 +33,7 @@ class StateSerializerRequest(serializers.ModelSerializer):
         depth = 1
 
 
-class UpdateStateSerializerRequest(serializers.ModelSerializer):
+class UpdateStateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
 
     class Meta:
@@ -47,21 +41,21 @@ class UpdateStateSerializerRequest(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class StateSerializerResponse(serializers.ModelSerializer):
-    class Meta:
-        model = State
-        fields = "__all__"
-
-
-class CitySerializerRequest(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = City
-        fields = ("name", "code", "state")
-
-
-class CitySerializerResponse(serializers.HyperlinkedModelSerializer):
-    state = StateSerializerResponse(read_only=True)
+class CitySerializer(serializers.HyperlinkedModelSerializer):
+    state = serializers.PrimaryKeyRelatedField(
+        read_only=False, queryset=State.objects.all()
+    )
 
     class Meta:
         model = City
         fields = ("id", "name", "code", "state")
+        read_only_fields = ("id",)
+        depth = 1
+
+
+class UpdateCitySerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = City
+        fields = "__all__"
