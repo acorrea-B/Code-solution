@@ -5,28 +5,30 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from location.serializers import CountrySerializerRequest
-from location.serializers import CountrySerializerResponse
-from location.serializers import UpdateCountrySerializerRequest
+from location.serializers import StateSerializerRequest
+from location.serializers import UpdateStateSerializerRequest
 
-from location.models import Country
+from location.serializers import StateSerializerResponse
 
 
-class CountryView(generics.ListAPIView):
+from location.models import State
+
+
+class StateView(generics.ListAPIView):
     def get_object(self, id):
         """
         Helper method to get the object with given id
         """
         try:
-            return Country.objects.get(id=id)
-        except Country.DoesNotExist:
+            return State.objects.get(id=id)
+        except State.DoesNotExist:
             return None
 
     @swagger_auto_schema(
-        request_body=CountrySerializerRequest,
+        request_body=StateSerializerRequest,
         responses={
-            status.HTTP_201_CREATED: CountrySerializerRequest(),
-            status.HTTP_400_BAD_REQUEST: CountrySerializerRequest,
+            status.HTTP_201_CREATED: StateSerializerResponse(),
+            status.HTTP_400_BAD_REQUEST: StateSerializerRequest,
         },
     )
     def post(self, request, *args, **kwargs):
@@ -34,22 +36,22 @@ class CountryView(generics.ListAPIView):
             "request": request,
         }
 
-        serializer = CountrySerializerRequest(data=request.data)
-
+        serializer = StateSerializerRequest(data=request.data, context = serializer_context)
+        
         serializer.is_valid(raise_exception=True)
+        
         serializer.save()
 
-
         return Response(
-            CountrySerializerResponse(serializer.data, context=serializer_context).data,
+           serializer.data,
             status.HTTP_201_CREATED,
         )
 
     @swagger_auto_schema(
-        request_body=UpdateCountrySerializerRequest,
+        request_body=UpdateStateSerializerRequest,
         responses={
-            status.HTTP_202_ACCEPTED: CountrySerializerResponse(),
-            status.HTTP_400_BAD_REQUEST: UpdateCountrySerializerRequest,
+            status.HTTP_202_ACCEPTED: UpdateStateSerializerRequest(),
+            status.HTTP_400_BAD_REQUEST: UpdateStateSerializerRequest,
         },
     )
     def put(self, request, *args, **kwargs):
@@ -57,24 +59,23 @@ class CountryView(generics.ListAPIView):
         serializer_context = {
             "request": request,
         }
-        country = self.get_object(request.data.get("id"))
+        State = self.get_object(request.data.get("id"))
 
-        if not country:
+        if not State:
             return Response(
-                {"message": "Country does not exists"},
+                {"message": "State does not exists"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        serializer = UpdateCountrySerializerRequest(
-            country, data=request.data, partial=True
+        serializer = UpdateStateSerializerRequest(
+            State, data=request.data, partial=True
         )
 
         serializer.is_valid(raise_exception=True)
 
         serializer.save()
 
-        return Response(
-            CountrySerializerResponse(serializer.data, context=serializer_context).data,
+        return Response(serializer.data,
             status.HTTP_202_ACCEPTED,
         )
 
@@ -83,13 +84,13 @@ class CountryView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="test manual param",
+                description="State id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
         responses={
-            status.HTTP_200_OK: CountrySerializerResponse(many=True),
-            status.HTTP_400_BAD_REQUEST: CountrySerializerResponse,
+            status.HTTP_200_OK: StateSerializerResponse(many=True),
+            status.HTTP_400_BAD_REQUEST: StateSerializerResponse,
         },
     )
     def get(self, request):
@@ -98,23 +99,23 @@ class CountryView(generics.ListAPIView):
         }
 
         if request.query_params.get("id"):
-            country = self.get_object(request.query_params.get("id"))
+            state = self.get_object(request.query_params.get("id"))
 
-            if not country:
+            if not state:
                 return Response(
-                    {"message": "Country does not exists"},
+                    {"message": "State does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             return Response(
-                CountrySerializerResponse(
-                    country,
+                StateSerializerResponse(
+                    state,
                     context=serializer_context,
                 ).data
             )
 
         return Response(
-            CountrySerializerResponse(
-                Country.objects.all().order_by("id"),
+            StateSerializerResponse(
+                State.objects.all().order_by("id"),
                 many=True,
                 context=serializer_context,
             ).data
@@ -125,7 +126,7 @@ class CountryView(generics.ListAPIView):
             openapi.Parameter(
                 "id",
                 openapi.IN_QUERY,
-                description="Country id",
+                description="State id",
                 type=openapi.TYPE_INTEGER,
             )
         ],
@@ -133,12 +134,12 @@ class CountryView(generics.ListAPIView):
     )
     def delete(self, request):
         if request.query_params.get("id"):
-            country = self.get_object(request.query_params.get("id"))
+            state = self.get_object(request.query_params.get("id"))
 
-            if not country:
+            if not state:
                 return Response(
-                    {"message": "Country does not exists"},
+                    {"message": "State does not exists"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            country.delete()
-            return Response({"message": "Country deleted"}, status.HTTP_200_OK)
+            state.delete()
+            return Response({"message": "State deleted"}, status.HTTP_200_OK)

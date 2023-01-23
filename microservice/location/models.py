@@ -9,7 +9,9 @@ class Country(models.Model):
 class State(models.Model):
     name = models.CharField(max_length=400)
     code = models.CharField(max_length=4)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    country = models.ForeignKey(
+        Country, on_delete=models.CASCADE, related_name="country"
+    )
 
 
 class City(models.Model):

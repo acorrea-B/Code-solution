@@ -26,18 +26,31 @@ class CountrySerializerResponse(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class StateSerializerRequest(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = State
-        fields = ("name", "code", "country")
+class StateSerializerRequest(serializers.ModelSerializer):
 
-
-class StateSerializerResponse(serializers.HyperlinkedModelSerializer):
-    country = CountrySerializerResponse(read_only=True)
+    country = serializers.PrimaryKeyRelatedField(
+        read_only=False, queryset=Country.objects.all()
+    )
 
     class Meta:
         model = State
         fields = ("id", "name", "code", "country")
+        read_only_fields = ("id",)
+        depth = 1
+
+
+class UpdateStateSerializerRequest(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
+    class Meta:
+        model = State
+        fields = "__all__"
+
+
+class StateSerializerResponse(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        fields = "__all__"
 
 
 class CitySerializerRequest(serializers.HyperlinkedModelSerializer):

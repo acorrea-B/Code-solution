@@ -5,6 +5,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 from location.models import Country
+from location.models import State
 
 
 class CreateCountry(TestCase):
@@ -197,3 +198,191 @@ class ListCountry(TestCase):
         result = json.loads(response.content)
 
         self.assertEqual(len(result), len(self.countrys))
+
+
+class CreateState(TestCase):
+    def setUp(self):
+        self.api = APIClient()
+        self.country = Country.objects.create(name="USA", code="US")
+        self.request_data = {
+            "name": "Idiana",
+            "code": "Indi",
+            "country": self.country.id,
+        }
+        self.wrong_request = {"name": "Florida", "country": 100}
+        self.wrong_request_data = {"name": "Florida", "code": "Florida"}
+
+    def test_fail_creation_wrong_request(self):
+        response = self.api.post(
+            "/api/v1/location/state/",
+            data=self.wrong_request,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("code")[0], "This field is required.")
+
+    def test_fail_creation_wrong_data_request(self):
+        response = self.api.post(
+            "/api/v1/location/state/",
+            data=self.wrong_request_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(
+            result.get("code")[0], "Ensure this field has no more than 4 characters."
+        )
+
+    def test_success_creation(self):
+        response = self.api.post(
+            "/api/v1/location/state/",
+            data=self.request_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("id"), 1)
+        self.assertEqual(result.get("name"), self.request_data.get("name"))
+        self.assertEqual(result.get("code"), self.request_data.get("code"))
+        self.assertEqual(result.get("country"), self.country.id)
+
+
+class UpdateState(TestCase):
+    def setUp(self):
+        self.api = APIClient()
+        self.first_country = Country.objects.create(name="China", code="Ch")
+        self.second_country = Country.objects.create(name="USA", code="US")
+        self.state = State.objects.create(
+            name="Ohiooo", code="Ohto", country=self.first_country
+        )
+        self.request_data = {
+            "id": self.state.id,
+            "name": "Ohio",
+            "code": "Ohio",
+            "country": self.second_country.id,
+        }
+        self.wrong_request = {"country": 100}
+        self.wrong_request_data = {
+            "id": self.state.id,
+            "name": "Toronto",
+            "code": "Toron",
+        }
+
+    def test_fail_update_wrong_request(self):
+        response = self.api.put(
+            "/api/v1/location/state/",
+            data=self.wrong_request,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("message"), "State does not exists")
+
+    def test_fail_update_wrong_data_request(self):
+        response = self.api.put(
+            "/api/v1/location/state/",
+            data=self.wrong_request_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(
+            result.get("code")[0], "Ensure this field has no more than 4 characters."
+        )
+
+    def test_success_update(self):
+        response = self.api.put(
+            "/api/v1/location/state/",
+            data=self.request_data,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("id"), self.state.id)
+        self.assertEqual(result.get("name"), self.request_data.get("name"))
+        self.assertEqual(result.get("code"), self.request_data.get("code"))
+        self.assertEqual(result.get("country"), self.second_country.id)
+
+
+class DeleteState(TestCase):
+    def setUp(self):
+        self.api = APIClient()
+        self.country = Country.objects.create(name="China", code="Ch")
+        self.state = State.objects.create(
+            name="Ohiooo", code="Ohto", country=self.country
+        )
+
+    def test_fail_delete_does_not_exist(self):
+        response = self.api.delete(
+            "/api/v1/location/state/?id=1000",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("message"), "State does not exists")
+
+    def test_success_delete(self):
+        response = self.api.delete(
+            f"/api/v1/location/state/?id={self.state.id}",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("message"), "State deleted")
+
+
+class GetState(TestCase):
+    def setUp(self):
+        self.api = APIClient()
+        self.country = Country.objects.create(name="China", code="Ch")
+        self.state = State.objects.create(
+            name="Ohiooo", code="Ohto", country=self.country
+        )
+
+    def test_fail_get_does_not_exist(self):
+        response = self.api.get(
+            "/api/v1/location/state/?id=1000",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("message"), "State does not exists")
+
+    def test_success_get(self):
+        response = self.api.get(
+            f"/api/v1/location/state/?id={self.state.id}",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        result = json.loads(response.content)
+
+        self.assertEqual(result.get("id"), self.state.id)
+        self.assertEqual(result.get("name"), self.state.name)
+        self.assertEqual(result.get("code"), self.state.code)
+        self.assertEqual(result.get("country"), self.country.id)
