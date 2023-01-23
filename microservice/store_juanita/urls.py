@@ -11,7 +11,7 @@ from location.api_urls import urlpatterns as location
 
 schema_view = swagger_get_schema_view(
     openapi.Info(
-        title="Amazonas store",
+        title="Amazonas store_juanita",
         default_version="1.0.0",
         description="API documentation",
     ),
